@@ -21,7 +21,7 @@ jobs:
     if: github.repository == 'helix-editor/helix' || github.event_name != 'schedule'
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install MSRV toolchain
         uses: dtolnay/rust-toolchain@master
@@ -52,7 +52,7 @@ jobs:
       HELIX_LOG_LEVEL: info
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install MSRV toolchain
         uses: dtolnay/rust-toolchain@master
@@ -86,7 +86,7 @@ jobs:
     if: github.repository == 'helix-editor/helix' || github.event_name != 'schedule'
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install MSRV toolchain
         uses: dtolnay/rust-toolchain@master
@@ -122,7 +122,7 @@ jobs:
     if: github.repository == 'helix-editor/helix' || github.event_name != 'schedule'
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install MSRV toolchain
         uses: dtolnay/rust-toolchain@master
