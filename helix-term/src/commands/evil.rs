@@ -224,21 +224,21 @@ impl EvilCommands {
                     }
                 }
 
-                return range;
+                range
             }),
         );
     }
 
     fn context() -> RwLockReadGuard<'static, EvilContext> {
-        return CONTEXT.read().unwrap();
+        CONTEXT.read().unwrap()
     }
 
     fn context_mut() -> RwLockWriteGuard<'static, EvilContext> {
-        return CONTEXT.write().unwrap();
+        CONTEXT.write().unwrap()
     }
 
     fn get_mode(cx: &mut Context) -> Mode {
-        return cx.editor.mode();
+        cx.editor.mode()
     }
 
     fn get_selection(cx: &mut Context) -> Option<Selection> {
@@ -329,7 +329,7 @@ impl EvilCommands {
             }
         }
 
-        return selection;
+        selection
     }
 
     fn get_character_based_selection(cx: &mut Context) -> Selection {
@@ -338,7 +338,7 @@ impl EvilCommands {
 
         // For each cursor, select one or more characters forward or backward according
         // to the count in the evil context and the motion respectively.
-        return doc.selection(view.id).clone().transform(|range| {
+        doc.selection(view.id).clone().transform(|range| {
             // TODO: it'd be nice if the get_*_selection() functions were independent of the
             // cx.count vs context().count logic
             // If we use an evil command which uses the hotkey twice (dd, yy, ...), we need to use the evil context,
@@ -356,7 +356,7 @@ impl EvilCommands {
             let head = head + count;
 
             Range::new(text.len_chars().min(anchor), text.len_chars().min(head))
-        });
+        })
     }
 
     fn get_bidirectional_word_based_selection(cx: &mut Context) -> Result<Selection, String> {
@@ -365,8 +365,7 @@ impl EvilCommands {
 
         Ok(doc.selection(view.id).clone().transform(|range| {
             let range = move_prev_word_start(text, range, 1);
-            let range = move_next_word_end(text, range, 1);
-            return range;
+            move_next_word_end(text, range, 1)
         }))
     }
 
@@ -382,7 +381,7 @@ impl EvilCommands {
                 Motion::NextWordEnd => true,
                 Motion::PrevWordStart => false,
                 _ => {
-                    error = Some(format!("Unsupported motion"));
+                    error = Some("Unsupported motion".to_string());
                     return range;
                 }
             };
@@ -437,10 +436,10 @@ impl EvilCommands {
             )
         });
 
-        if error.is_none() {
-            return Ok(selection);
+        if let Some(err) = error {
+            Err(err)
         } else {
-            return Err(error.unwrap());
+            Ok(selection)
         }
     }
 
@@ -504,14 +503,14 @@ impl EvilCommands {
                 end = end.saturating_sub(1); // TODO: we're removing LF, but what about multiple EOL characters?
             }
 
-            return match motion {
+            match motion {
                 Motion::LineStart => Range::new(start, range.anchor.max(range.head)),
                 Motion::LineEnd => Range::new(range.anchor.min(range.head), end),
                 _ => panic!("Unsupported motion"),
-            };
+            }
         });
 
-        return Ok(selection);
+        Ok(selection)
     }
 
     fn get_full_line_based_selection(
@@ -583,17 +582,18 @@ impl EvilCommands {
         // See also: select_textobject() in commands.rs
 
         return Some(doc.selection(view.id).clone().transform(|range| {
-            return textobject::textobject_paragraph(
+            textobject::textobject_paragraph(
                 text,
                 range,
                 ts_modifier,
                 Self::context().count.unwrap_or(1),
-            );
+            )
             // TODO: textobject_paragraph() selects the last newline,
             // which causes a different behavior compared to vim
         }));
     }
 
+    #[allow(dead_code)]
     fn get_treesitter_object_selection(cx: &mut Context, object: &str) -> Option<Selection> {
         let (view, doc) = current!(cx.editor);
         let text = doc.text().slice(..);
@@ -617,12 +617,12 @@ impl EvilCommands {
 
         // See also: select_textobject() in commands.rs
 
-        return Some(doc.selection(view.id).clone().transform(|range| {
+        Some(doc.selection(view.id).clone().transform(|range| {
             let Some(syntax) = doc.syntax() else {
                 return range;
             };
 
-            return textobject::textobject_treesitter(
+            textobject::textobject_treesitter(
                 text,
                 range,
                 ts_modifier,
@@ -630,8 +630,8 @@ impl EvilCommands {
                 syntax,
                 &loader,
                 Self::context().count.unwrap_or(1),
-            );
-        }));
+            )
+        }))
     }
 
     fn strip_trailing_line_break(text: &Rope, range: (usize, usize)) -> (usize, usize) {
@@ -649,11 +649,11 @@ impl EvilCommands {
             }
         }
 
-        return if !inversed {
+        if !inversed {
             (start, end)
         } else {
             (end, start)
-        };
+        }
     }
 
     fn yank_selection(cx: &mut Context, selection: &Selection, _set_status_message: bool) {
@@ -676,11 +676,11 @@ impl EvilCommands {
     fn delete_selection(cx: &mut Context, selection: &Selection, _set_status_message: bool) {
         if cx.register != Some('_') {
             // first yank the selection
-            Self::yank_selection(cx, &selection, false);
+            Self::yank_selection(cx, selection, false);
         };
 
         let (view, doc) = current!(cx.editor);
-        let transaction = Transaction::change_by_selection(doc.text(), &selection, |range| {
+        let transaction = Transaction::change_by_selection(doc.text(), selection, |range| {
             (range.from(), range.to(), None)
         });
 
@@ -789,7 +789,7 @@ impl EvilCommands {
         // TODO: better way to parse a char?
         if let Some(value) = e
             .char()
-            .and_then(|c| usize::from_str_radix(c.to_string().as_str(), 10).ok())
+            .and_then(|c| c.to_string().as_str().parse::<usize>().ok())
         {
             let mut evil_context = Self::context_mut();
 
@@ -819,7 +819,7 @@ impl EvilCommands {
             // Then we expect a text object and execute the command.
             // If we don't get a text object, interrupt command.
             if Self::context().modifier.is_some() {
-                if let Some(text_object) = TextObject::try_from(c).ok() {
+                if let Ok(text_object) = TextObject::try_from(c) {
                     log::trace!("Key callback: Detected text object key '{}'", c);
 
                     Self::context_mut().text_object = Some(text_object);
@@ -828,7 +828,7 @@ impl EvilCommands {
                 }
             } else {
                 // Is the command receiving a modifier?
-                if let Some(modifier) = Modifier::try_from(c).ok() {
+                if let Ok(modifier) = Modifier::try_from(c) {
                     log::trace!("Key callback: Detected modifier key '{}'", c);
 
                     Self::context_mut().modifier = Some(modifier);
@@ -904,9 +904,8 @@ impl EvilCommands {
             cx.on_next_key(move |cx, event| {
                 inner_callback.0(cx, event);
 
-                match Self::get_mode(cx) {
-                    Mode::Normal => Self::collapse_selections(cx, CollapseMode::ToHead),
-                    _ => {}
+                if Self::get_mode(cx) == Mode::Normal {
+                    Self::collapse_selections(cx, CollapseMode::ToHead)
                 }
             })
         } else {

@@ -131,7 +131,7 @@ async fn test_persistence() -> anyhow::Result<()> {
     // The weird looking format of the string is because persistence data is encoded using bincode.
     assert_eq!(
         search_histfile_contents,
-        "\u{1}\0\0\0\0\0\0\01\u{1}\0\0\0\0\0\0\02\u{1}\0\0\0\0\0\0\03"
+        "\u{1}\0\0\0\0\0\0\x01\u{1}\0\0\0\0\0\0\x02\u{1}\0\0\0\0\0\0\x03"
     );
 
     Ok(())

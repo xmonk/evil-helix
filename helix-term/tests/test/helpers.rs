@@ -8,7 +8,6 @@ use std::{
 use anyhow::bail;
 use crossterm::event::{Event, KeyEvent};
 use helix_core::{diagnostic::Severity, test, Selection, Transaction};
-use helix_loader;
 use helix_term::{application::Application, args::Args, config::Config, keymap::merge_keys};
 use helix_view::{current_ref, doc, editor::LspConfig, input::parse_macro, Editor};
 use tempfile::NamedTempFile;
@@ -62,6 +61,7 @@ pub struct TestCase {
     pub out_text: String,
     pub out_selection: Selection,
 
+    #[allow(dead_code)]
     pub line_feed_handling: LineFeedHandling,
 }
 
@@ -425,7 +425,7 @@ pub fn reload_file(file: &mut NamedTempFile) -> anyhow::Result<()> {
     let f = std::fs::OpenOptions::new()
         .write(true)
         .read(true)
-        .open(&path)?;
+        .open(path)?;
     *file.as_file_mut() = f;
     Ok(())
 }

@@ -254,15 +254,15 @@ impl<'de> Deserialize<'de> for Theme {
     }
 }
 
-fn build_theme_values(
-    mut values: Map<String, Value>,
-) -> (
+type ThemeValues = (
     HashMap<String, Style>,
     Vec<String>,
     Vec<Style>,
     Vec<String>,
     usize,
-) {
+);
+
+fn build_theme_values(mut values: Map<String, Value>) -> ThemeValues {
     let mut styles = HashMap::new();
     let mut scopes = Vec::new();
     let mut highlights = Vec::new();

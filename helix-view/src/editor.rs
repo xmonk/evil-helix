@@ -1179,13 +1179,14 @@ impl Default for Config {
 
 impl Config {
     pub fn default_evil() -> Self {
-        let mut config = Config::default();
-        config.evil = true;
-        config.statusline = StatusLineConfig::default_evil();
-        config.color_modes = true;
-        config.insert_final_newline = false;
-        config.smart_tab = Some(SmartTabConfig::default_evil());
-        return config;
+        Config {
+            evil: true,
+            statusline: StatusLineConfig::default_evil(),
+            color_modes: true,
+            insert_final_newline: false,
+            smart_tab: Some(SmartTabConfig::default_evil()),
+            ..Default::default()
+        }
     }
 }
 

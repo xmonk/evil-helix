@@ -625,12 +625,10 @@ impl Selection {
         assert!(!ranges.is_empty());
         debug_assert!(primary_index < ranges.len());
 
-        let selection = Self {
+        Self {
             ranges,
             primary_index,
-        };
-
-        selection.normalize()
+        }.normalize()
     }
 
     pub fn evil_new_no_normalize(ranges: SmallVec<[Range; 1]>, primary_index: usize) -> Self {
@@ -638,12 +636,10 @@ impl Selection {
         assert!(!ranges.is_empty());
         debug_assert!(primary_index < ranges.len());
 
-        let selection = Self {
+        Self {
             ranges,
             primary_index,
-        };
-
-        selection
+        }
     }
 
     /// Takes a closure and maps each `Range` over the closure.
